@@ -1,0 +1,21 @@
+# set bucket for upload lambda source.
+SOURCE_UPLOAD_BUCKET=my-lambda-bucket
+
+# packge, lambda source upload bucket 
+aws cloudformation package \
+    --template-file cfn-list-account-function.yaml \
+    --s3-bucket $SOURCE_UPLOAD_BUCKET \
+    --output-template-file cfn-list-account-function-packaged.yaml
+
+# (first release) deploy lambda
+aws cloudformation create-stack \
+    --stack-name list-account-function \
+    --template-body file://./cfn-list-account-function-packaged.yaml \
+    --capabilities CAPABILITY_NAMED_IAM
+
+# update lambda
+aws cloudformation update-stack \
+    --stack-name list-account-function \
+    --template-body file://./cfn-list-account-function-packaged.yaml \
+    --capabilities CAPABILITY_NAMED_IAM
+

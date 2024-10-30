@@ -6,20 +6,21 @@ Parameters:
     Type: String
     Default: list-account-in-organizations
 
-  ListAccountsRoleName:
+  OuRootRoleName:
     Type: String
     Default: role_list_accounts
 
-  PaymentAccountId:
+  OuRootAccountId:
     Type: String
-    Default: xxxxxxxxxxxx
+    Default: xxxxxxxxxxxx # set ou root account id.
 
 Resources:
 
-  AssumeOrgRootPolicy:
+  # IAM Policy
+  ListAccountsFunctionPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: "policy_assume_org_root"
+      ManagedPolicyName: "policy_list_accounts_function"
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -28,16 +29,17 @@ Resources:
           Action:
           - "sts:AssumeRole"
           Resource:
-          - !Sub arn:aws:iam::*:role/${ListAccountsRoleName}
+          - !Sub "arn:aws:iam::*:role/${OuRootRoleName}"
 
-  AssumeOrgRootRole:
+  # IAM Role
+  ListAccountsFunctionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: "role_assume_org_root"
+      RoleName: "role_list_accounts_function"
       Path: "/"
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/AWSLambdaExecute
-      - !Ref AssumeOrgRootPolicy
+      - !Ref ListAccountsFunctionPolicy
       AssumeRolePolicyDocument:
         Statement:
         - Effect: Allow
@@ -45,16 +47,17 @@ Resources:
             Service: lambda.amazonaws.com
           Action: sts:AssumeRole
 
+  # Lambda Function
   ListAccountLambda:
     Type: AWS::Lambda::Function
     Properties:
-      Code: lambda/
+      Code: lambda
       FunctionName: !Ref FunctionName
       Environment:
         Variables:
-          ASSUME_ROLE_NAME: !Sub ${ListAccountsRoleName}
-          PAYMENT_ACCOUNT_ID: !Sub ${PaymentAccountId}
+          ASSUME_ROLE_NAME: !Sub ${OuRootRoleName}
+          OU_ROOT_ACCOUNT_ID: !Sub ${OuRootAccountId}
       Handler: main.handler
-      Role: !GetAtt AssumeOrgRootRole.Arn
+      Role: !GetAtt ListAccountsFunctionRole.Arn
       Runtime: python3.12
       Timeout: 60

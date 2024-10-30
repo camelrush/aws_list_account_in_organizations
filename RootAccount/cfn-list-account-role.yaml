@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Deploy list-account role.
+
+Parameters:
+
+  SubAccountId:
+    Type: String
+    Default: xxxxxxxxxxxx # set sub account id.
+
+  FunctionRoleName:
+    Type: String
+    Default: role_list_accounts_function
+
+Resources:
+  ListAccountsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: "policy_list_accounts"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+          - "organizations:ListAccountsForParent"
+          - "organizations:ListAccounts"
+          - "organizations:ListOrganizationalUnitsForParent"
+          Resource: "*"
+
+  ListAccountsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: "role_list_accounts"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            AWS:
+            - !Sub "arn:aws:iam::${SubAccountId}:role/${FunctionRoleName}"
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - !Ref ListAccountsPolicy

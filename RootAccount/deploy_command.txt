@@ -1,0 +1,12 @@
+# (first release) deploy role
+aws cloudformation create-stack \
+    --stack-name list-account-role \
+    --template-body file://./cfn-list-account-role.yaml \
+    --capabilities CAPABILITY_NAMED_IAM
+
+# update lambda
+aws cloudformation update-stack \
+    --stack-name list-account-role \
+    --template-body file://./cfn-list-account-role.yaml \
+    --capabilities CAPABILITY_NAMED_IAM
+

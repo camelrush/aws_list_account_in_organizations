@@ -2,7 +2,7 @@ import os
 import boto3
 from boto3.session import Session
 
-PAYMENT_ACCOUNT_ID = os.environ['PAYMENT_ACCOUNT_ID']
+OU_ROOT_ACCOUNT_ID = os.environ['OU_ROOT_ACCOUNT_ID']
 ASSUME_ROLE_NAME = os.environ['ASSUME_ROLE_NAME']
 
 def handler(event, context):
@@ -10,8 +10,8 @@ def handler(event, context):
     # 取得したいOUのIDを指定
     root_ou_id = event['ou-id']
      
-    # PaymentAccountにAssumeRole
-    assume_role_arn = f'arn:aws:iam::{PAYMENT_ACCOUNT_ID}:role/{ASSUME_ROLE_NAME}'
+    # OuRootAccountにAssumeRole
+    assume_role_arn = f'arn:aws:iam::{OU_ROOT_ACCOUNT_ID}:role/{ASSUME_ROLE_NAME}'
     assume_session = assume_role(assume_role_arn, 'list_account_session')
 
     # AWS Organizationsクライアントの作成
