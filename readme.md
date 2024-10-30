@@ -1,5 +1,8 @@
 # Get account info within AWS organizations.
 
+### Design.
+![](./assets/img/structure.png)
+
 ### Ready for deploy
 Create s3 bucket to SubAccount, for upload lambda source.
 
